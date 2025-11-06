@@ -45,22 +45,26 @@ app.post('/api/generate-pairing', async (req, res) => {
                 clientId: `client-${phoneNumber}-${Date.now()}`
             }),
             puppeteer: {
+                executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || "/usr/bin/chromium",
                 headless: true,
                 args: [
                     '--no-sandbox',
-                    '--disable-setuid-sandbox',
-                    '--disable-dev-shm-usage',
-                    '--disable-accelerated-2d-canvas',
-                    '--no-first-run',
-                    '--no-zygote',
-                    '--single-process',
-                    '--disable-gpu'
+                    '--disable-setuid-sandbox'
                 ]
             }
         });
 
+        client.on('qr', (qr) => {
+            qrcode.toDataURL(qr, (err, url) => {
+                if (!err) {
+                    // You can send this url to your frontend for QR display if you want
+                    console.log('QR Code generated');
+                }
+            });
+        });
+
         client.on('ready', () => {
-            console.log(`Client ready: ${phoneNumber}`);
+            console.log(`Client ready for: ${phoneNumber}`);
         });
 
         client.on('authenticated', () => {
