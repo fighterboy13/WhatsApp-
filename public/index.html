@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Message Sender</title>
+    <style>
+        :root {
+            --color-primary: #25d366;
+            --color-primary-dark: #1da851;
+            --color-background: #f5f5f5;
+            --color-surface: #ffffff;
+            --color-text: #1f1f1f;
+            --color-text-secondary: #666666;
+            --color-border: #e0e0e0;
+            --color-success: #25d366;
+            --color-danger: #dc3545;
+            --color-warning: #ffc107;
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: var(--color-background);
+            color: var(--color-text);
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 15px 0;
+            background-color: var(--color-surface);
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px 10px;
+            font-size: 12px;
+            color: var(--color-text-secondary);
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0 20px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 8px 15px;
+            border: 1px solid var(--color-border);
+            border-radius: 20px;
+            font-size: 14px;
+        }
+
+        .refresh-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+        }
+
+        h1 {
+            font-size: 18px;
+            color: var(--color-primary);
+            margin-bottom: 5px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .section {
+            background-color: var(--color-surface);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-md);
+            border: 2px solid var(--color-primary);
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--color-border);
+            border-radius: 25px;
+            font-size: 14px;
+            background-color: #f0fff4;
+            transition: all 0.3s;
+            margin-bottom: 15px;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(37, 211, 102, 0.1);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px 20px;
+            background-color: var(--color-primary);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+        }
+
+        .btn:hover {
+            background-color: var(--color-primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .file-input-label {
+            display: block;
+            width: 100%;
+            padding: 12px 15px;
+            background-color: #f0fff4;
+            border: 1px solid var(--color-border);
+            border-radius: 25px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .file-name {
+            font-size: 12px;
+            color: var(--color-primary);
+            text-align: center;
+            margin-top: 5px;
+        }
+
+        select.input-field {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            padding-right: 40px;
+        }
+
+        .status-section {
+            background: linear-gradient(135deg, #f0fff4 0%, #e6ffe6 100%);
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .status-item:last-child {
+            border-bottom: none;
+        }
+
+        .status-label {
+            font-weight: 600;
+            color: var(--color-text);
+        }
+
+        .status-value {
+            font-weight: 700;
+            font-size: 18px;
+            color: var(--color-primary);
+        }
+
+        .pairing-code-display {
+            font-size: 32px;
+            font-weight: bold;
+            letter-spacing: 5px;
+            color: var(--color-primary);
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            margin-top: 15px;
+            text-align: center;
+            display: none;
+        }
+
+        .pairing-code-display.active {
+            display: block;
+        }
+
+        .message-log {
+            max-height: 200px;
+            overflow-y: auto;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .message-log.active {
+            display: block;
+        }
+
+        .log-item {
+            padding: 8px;
+            margin-bottom: 8px;
+            background-color: white;
+            border-radius: 5px;
+            border-left: 3px solid var(--color-primary);
+            font-size: 13px;
+        }
+
+        .log-item.success {
+            border-left-color: var(--color-success);
+        }
+
+        .log-item.error {
+            border-left-color: var(--color-danger);
+        }
+
+        .warning-text {
+            font-size: 11px;
+            color: var(--color-danger);
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        textarea.input-field {
+            min-height: 80px;
+            resize: vertical;
+            font-family: inherit;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-top">
+            <span>12:01:54</span>
+            <span>📶 📡 🔋</span>
+        </div>
+        <div class="search-bar">
+            <span>🔍</span>
+            <input type="text" class="search-input" placeholder="WhatsApp Message Sender" readonly>
+            <button class="refresh-btn">⟳</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1 style="text-align: center; margin-bottom: 20px;">WhatsApp Auto Sender</h1>
+
+        <!-- Section 1: Pairing Setup -->
+        <div class="section">
+            <input type="tel" class="input-field" id="phoneNumber" placeholder="Enter Your WhatsApp Number (with country code)">
+            <button class="btn" id="generatePairingBtn">Generate Pairing Code</button>
+            <div class="pairing-code-display" id="pairingCodeDisplay"></div>
+            <p class="warning-text">⚠️ Open WhatsApp &gt; Linked Devices &gt; Link with Phone Number</p>
+        </div>
+
+        <!-- Section 2: Message Configuration -->
+        <div class="section">
+            <select class="input-field" id="targetType">
+                <option value="">-- Select Target Type --</option>
+                <option value="single">Single Number</option>
+                <option value="group">Group URL</option>
+                <option value="bulk">Bulk Numbers (File Upload)</option>
+            </select>
+            <input type="text" class="input-field" id="targetInput" placeholder="Enter Target Number / Group URL">
+            <div class="file-input-wrapper" id="fileInputWrapper">
+                <label class="file-input-label" for="fileInput">Choose File: No file chosen</label>
+                <input type="file" id="fileInput" accept=".txt,.csv">
+                <div class="file-name" id="fileName"></div>
+            </div>
+            <textarea class="input-field" id="messagePrefix" placeholder="Enter Message Prefix (optional)"></textarea>
+            <input type="number" class="input-field" id="messageDelay" placeholder="Delay in Seconds (between messages)" value="5" min="1">
+            <button class="btn" id="startSendingBtn">Start Sending Messages</button>
+            <div class="message-log" id="messageLog"></div>
+        </div>
+
+        <!-- Section 3: Task Management -->
+        <div class="section">
+            <button class="btn" id="showMyTaskBtn">Show My Task (0)</button>
+        </div>
+
+        <!-- Section 4: Stop Task -->
+        <div class="section">
+            <input type="text" class="input-field" id="taskIdInput" placeholder="Enter Your Task ID to Stop">
+            <button class="btn" id="stopTaskBtn">Stop My Task</button>
+        </div>
+
+        <!-- Section 5: Status -->
+        <div class="section status-section">
+            <div class="status-item">
+                <span class="status-label">Active Sessions:</span>
+                <span class="status-value" id="activeSessions">0</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Active Tasks:</span>
+                <span class="status-value" id="activeTasks">0</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = window.location.origin;
+        
+        let appState = {
+            isConnected: false,
+            phoneNumber: '',
+            sessionId: '',
+            currentTaskId: null,
+            activeSessions: 0,
+            activeTasks: 0,
+            messageQueue: [],
+            isSending: false
+        };
+
+        const phoneNumberInput = document.getElementById('phoneNumber');
+        const generatePairingBtn = document.getElementById('generatePairingBtn');
+        const pairingCodeDisplay = document.getElementById('pairingCodeDisplay');
+        const targetTypeSelect = document.getElementById('targetType');
+        const targetInput = document.getElementById('targetInput');
+        const fileInputWrapper = document.getElementById('fileInputWrapper');
+        const fileInput = document.getElementById('fileInput');
+        const fileNameDisplay = document.getElementById('fileName');
+        const messagePrefixInput = document.getElementById('messagePrefix');
+        const messageDelayInput = document.getElementById('messageDelay');
+        const startSendingBtn = document.getElementById('startSendingBtn');
+        const messageLog = document.getElementById('messageLog');
+        const showMyTaskBtn = document.getElementById('showMyTaskBtn');
+        const taskIdInput = document.getElementById('taskIdInput');
+        const stopTaskBtn = document.getElementById('stopTaskBtn');
+        const activeSessionsDisplay = document.getElementById('activeSessions');
+        const activeTasksDisplay = document.getElementById('activeTasks');
+
+        function updateStatus() {
+            activeSessionsDisplay.textContent = appState.activeSessions;
+            activeTasksDisplay.textContent = appState.activeTasks;
+            showMyTaskBtn.textContent = `Show My Task (${appState.activeTasks})`;
+        }
+
+        function addLogMessage(message, type = 'success') {
+            const logItem = document.createElement('div');
+            logItem.className = `log-item ${type}`;
+            logItem.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            messageLog.appendChild(logItem);
+            messageLog.scrollTop = messageLog.scrollHeight;
+        }
+
+        generatePairingBtn.addEventListener('click', async () => {
+            const phoneNumber = phoneNumberInput.value.trim();
+            
+            if (!phoneNumber) {
+                alert('Please enter your WhatsApp number with country code');
+                return;
+            }
+
+            generatePairingBtn.textContent = 'Connecting...';
+            generatePairingBtn.disabled = true;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/generate-pairing`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phoneNumber: phoneNumber })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    appState.phoneNumber = phoneNumber;
+                    appState.sessionId = data.sessionId;
+                    
+                    pairingCodeDisplay.textContent = data.pairingCode;
+                    pairingCodeDisplay.classList.add('active');
+                    
+                    generatePairingBtn.textContent = 'Connected ✓';
+                    generatePairingBtn.style.backgroundColor = '#28a745';
+                    
+                    appState.isConnected = true;
+                    appState.activeSessions++;
+                    updateStatus();
+
+                    addLogMessage('Session connected successfully!', 'success');
+                } else {
+                    throw new Error(data.error || 'Failed to generate pairing code');
+                }
+            } catch (error) {
+                alert('Failed to connect: ' + error.message);
+                generatePairingBtn.textContent = 'Generate Pairing Code';
+                generatePairingBtn.disabled = false;
+                addLogMessage('Failed: ' + error.message, 'error');
+            }
+        });
+
+        targetTypeSelect.addEventListener('change', (e) => {
+            if (e.target.value === 'bulk') {
+                fileInputWrapper.style.display = 'block';
+                targetInput.style.display = 'none';
+            } else {
+                fileInputWrapper.style.display = 'none';
+                targetInput.style.display = 'block';
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                fileNameDisplay.textContent = `Selected: ${file.name}`;
+                document.querySelector('.file-input-label').textContent = file.name;
+                
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const content = event.target.result;
+                    const numbers = content.split(/[
+,]/).map(n => n.trim()).filter(n => n);
+                    appState.messageQueue = numbers;
+                    addLogMessage(`Loaded ${numbers.length} numbers`, 'success');
+                };
+                reader.readAsText(file);
+            }
+        });
+
+        startSendingBtn.addEventListener('click', async () => {
+            if (!appState.isConnected) {
+                alert('Please connect WhatsApp first');
+                return;
+            }
+
+            const targetType = targetTypeSelect.value;
+            const targetValue = targetInput.value.trim();
+            const messagePrefix = messagePrefixInput.value.trim() || 'Hello!';
+            const delay = parseInt(messageDelayInput.value) || 5;
+
+            if (!targetType) {
+                alert('Please select target type');
+                return;
+            }
+
+            messageLog.classList.add('active');
+            startSendingBtn.disabled = true;
+            startSendingBtn.textContent = 'Sending...';
+
+            try {
+                if (targetType === 'bulk') {
+                    const response = await fetch(`${API_BASE_URL}/api/send-bulk`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            sessionId: appState.sessionId,
+                            numbers: appState.messageQueue,
+                            message: messagePrefix,
+                            delay: delay
+                        })
+                    });
+
+                    const data = await response.json();
+                    if (data.success) {
+                        appState.currentTaskId = data.taskId;
+                        taskIdInput.value = data.taskId;
+                        appState.activeTasks++;
+                        updateStatus();
+                        addLogMessage(`Task: ${data.taskId}`, 'success');
+                    }
+                } else {
+                    const response = await fetch(`${API_BASE_URL}/api/send-message`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            sessionId: appState.sessionId,
+                            number: targetValue,
+                            message: messagePrefix
+                        })
+                    });
+
+                    const data = await response.json();
+                    if (data.success) {
+                        addLogMessage('Message sent!', 'success');
+                    }
+                }
+            } catch (error) {
+                addLogMessage('Error: ' + error.message, 'error');
+            } finally {
+                startSendingBtn.disabled = false;
+                startSendingBtn.textContent = 'Start Sending Messages';
+            }
+        });
+
+        stopTaskBtn.addEventListener('click', async () => {
+            const taskId = taskIdInput.value.trim();
+            if (!taskId) {
+                alert('Enter task ID');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/stop-task`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ taskId: taskId })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    addLogMessage('Task stopped', 'success');
+                    appState.activeTasks = Math.max(0, appState.activeTasks - 1);
+                    updateStatus();
+                }
+            } catch (error) {
+                addLogMessage('Error: ' + error.message, 'error');
+            }
+        });
+
+        showMyTaskBtn.addEventListener('click', () => {
+            if (appState.currentTaskId) {
+                alert(`Task ID: ${appState.currentTaskId}`);
+            } else {
+                alert('No active tasks');
+            }
+        });
+
+        updateStatus();
+    </script>
+</body>
+  </html>
